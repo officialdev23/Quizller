@@ -626,7 +626,7 @@ iframe {
 /*[ Logo ]
 -----------------------------------------------------------*/
 .logo {
-  display: block;
+  display: inline;
   position: absolute;
   left: 52px;
   top: 50%;
@@ -638,7 +638,7 @@ iframe {
 }
 
 .logo img {
-  max-height: 27px;
+  max-height: 70px;
 }
 
 

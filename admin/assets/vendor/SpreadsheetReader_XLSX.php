@@ -440,30 +440,29 @@
 			$CacheValue = '';
 			while ($this -> SharedStrings -> read())
 			{
-				switch ($this -> SharedStrings -> name)
+				switch ($this->SharedStrings->name)
 				{
 					case 'si':
-						if ($this -> SharedStrings -> nodeType == XMLReader::END_ELEMENT)
+						if ($this->SharedStrings->nodeType == XMLReader::END_ELEMENT)
 						{
-							$this -> SharedStringCache[$CacheIndex] = $CacheValue;
+							$this->SharedStringCache[$CacheIndex] = $CacheValue;
 							$CacheIndex++;
 							$CacheValue = '';
 						}
 						break;
 					case 't':
-						if ($this -> SharedStrings -> nodeType == XMLReader::END_ELEMENT)
+						if ($this->SharedStrings->nodeType == XMLReader::END_ELEMENT)
 						{
-							continue;
+							continue 2;  // Use continue 2 if inside a loop, otherwise review logic
 						}
-						$CacheValue .= $this -> SharedStrings -> readString();
+						$CacheValue .= $this->SharedStrings->readString();
 						break;
 				}
+		
+				$this->SharedStrings->close();
+				return true;  // Return value to indicate successful processing
 			}
-
-			$this -> SharedStrings -> close();
-			return true;
 		}
-
 		/**
 		 * Retrieves a shared string value by its index
 		 *
@@ -573,26 +572,28 @@
 			{
 				while ($this -> SharedStrings -> read())
 				{
-					switch ($this -> SharedStrings -> name)
-					{
-						case 't':
-							if ($this -> SharedStrings -> nodeType == XMLReader::END_ELEMENT)
-							{
-								continue;
-							}
-							$Value .= $this -> SharedStrings -> readString();
-							break;
-						case 'si':
-							if ($this -> SharedStrings -> nodeType == XMLReader::END_ELEMENT)
-							{
-								$this -> SSOpen = false;
-								$this -> SSForwarded = true;
-								break 2;
-							}
-							break;
-					}
-				}
-			}
+					
+    switch ($this->SharedStrings->name)
+    {
+        case 't':
+            if ($this->SharedStrings->nodeType == XMLReader::END_ELEMENT)
+            {
+                continue;  // Skip the rest of the loop iteration if end element
+            }
+            $Value .= $this->SharedStrings->readString();  // Read and append string
+            break;
+
+        case 'si':
+            if ($this->SharedStrings->nodeType == XMLReader::END_ELEMENT)
+            {
+                $this->SSOpen = false;  // Stop reading more shared strings
+                $this->SSForwarded = true;  // Mark as forwarded
+                break 2;  // Exit both the switch and the loop
+            }
+            break;
+    }
+}
+
 
 			if ($Value)
 			{
